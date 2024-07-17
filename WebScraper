@@ -1,0 +1,47 @@
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+import com.opencsv.CSVWriter;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class WebScraper {
+
+    public static void main(String[] args) {
+        String url = "https://www.example.com"; // Replace with the actual URL
+        List<String[]> productList = new ArrayList<>();
+
+        // Add headers
+        productList.add(new String[]{"Name", "Price", "Rating"});
+
+        try {
+            Document doc = Jsoup.connect(url).get();
+            Elements products = doc.select(".product"); // Adjust the selector to match the website's HTML structure
+
+            for (Element product : products) {
+                String name = product.select(".product-name").text(); // Adjust the selector to match the website's HTML structure
+                String price = product.select(".product-price").text(); // Adjust the selector to match the website's HTML structure
+                String rating = product.select(".product-rating").text(); // Adjust the selector to match the website's HTML structure
+
+                productList.add(new String[]{name, price, rating});
+            }
+
+            writeDataToCSV("products.csv", productList);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void writeDataToCSV(String filePath, List<String[]> data) {
+        try (CSVWriter writer = new CSVWriter(new FileWriter(filePath))) {
+            writer.writeAll(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
